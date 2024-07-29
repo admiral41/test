@@ -1,13 +1,13 @@
 import Banner from "../component/Banner";
 import LandingFeatures from "../component/LandingFeatures";
-import PricingTable from "../component/PricingTable";
+import FeatureList from "../component/PricingTable";
 
 const Landing = () => {
   return (
     <div>
       <Banner />
       <LandingFeatures />
-      <PricingTable />
+      <FeatureList />
     </div>
   );
 };
