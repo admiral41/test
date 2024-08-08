@@ -19,13 +19,13 @@ const ApplicationLayout = () => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        toast.warn("You need to be logged in to access this page");
+        toast.error("You need to be logged in to access this page");
         navigate("/");
         return;
       }
 
       try {
-        const response = await fetch('/api/auth/check', {
+        const response = await fetch('http://localhost:5000/api/users/auth/check', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -41,6 +41,8 @@ const ApplicationLayout = () => {
         setIsLoaded(true);
       } catch (error) {
         toast.error("Please log in to view this page.");
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate("/");
       }
     };
@@ -52,7 +54,7 @@ const ApplicationLayout = () => {
 
   return (
     <div className="p-5 px-8 md:px-28 max-sm:px-2">
-      <ApplicationTabs />
+      <ApplicationTabs user={user} />
       <Outlet />
       <Toaster position="top-center" />
     </div>

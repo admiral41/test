@@ -1,16 +1,18 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import FileDownload from "./pages/FileDownload";
-import ApplicationLayout from "./pages/ApplicationLayout";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Landing from "./pages/Landing";
-import HomeLayout from "./pages/homeLayout";
-
+import FileDownload from './pages/FileDownload';
+import ApplicationLayout from './pages/ApplicationLayout';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Landing from './pages/Landing';
+import ApplicationPage from './pages/ApplicationPage';
+import FileHistory from './pages/FileHistory';
+import UserProfilePage from './pages/UserProfilePage';
+import { AuthProvider } from './context/AuthContext';
+import HomeLayout from './pages/homeLayout';
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <HomeLayout />,
     children: [
       {
@@ -18,25 +20,24 @@ const router = createBrowserRouter([
         element: <Landing />,
       },
       {
-        path: "/signup",
+        path: '/signup',
         element: <Signup />,
       },
       {
-        path: "/login",
+        path: '/login',
         element: <Login />,
       },
       {
-        path: "/app",
+        path: '/app',
         element: <ApplicationLayout />,
         children: [
-          { path: "/app", element: <ApplicationLayout /> },
-          // { path: "/app/file-history", element: <FileHistory /> },
-          // { path: "/app/user-profile", element: <UserProfilePage /> },
-          // { path: "/app/user-dashboard", element: <UserDashboard /> },
+          { path: '/app', element: <ApplicationPage /> },
+          { path: '/app/file-history', element: <FileHistory /> },
+          { path: '/app/user-profile', element: <UserProfilePage /> }
         ],
       },
       {
-        path: "/download",
+        path: '/download',
         element: <FileDownload />,
       },
     ],
@@ -45,10 +46,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <RouterProvider router={router} />
       <Toaster position="top-center" />
-    </>
+    </AuthProvider>
   );
 }
 

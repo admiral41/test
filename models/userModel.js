@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const logSchema = new mongoose.Schema({
     ip: String,
     location: String,
+    latitude: Number,
+    longitude: Number,
     timestamp: { type: Date, default: Date.now },
     action: String
 });

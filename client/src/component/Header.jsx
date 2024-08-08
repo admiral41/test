@@ -1,9 +1,11 @@
-import { useState } from "react";
-import Logo from "../assets/logo v2 nobg.png"; // Ensure the path is correct
-import { Link, NavLink } from "react-router-dom";
+import { useState, useContext } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import Logo from '../assets/logo v2 nobg.png';
+import { AuthContext } from '../context/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isLoggedIn } = useContext(AuthContext);
 
   return (
     <nav className="bg-white dark:bg-gray-900 w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
@@ -12,19 +14,29 @@ const Header = () => {
           <img src={Logo} width={170} height={230} alt="EncryptShare Logo" />
         </Link>
         <div className="flex md:order-2 space-x-3 md:space-x-2 rtl:space-x-reverse">
-          {/* Remove Clerk components and add appropriate buttons */}
-          <Link
-            to="/login"
-            className="text-blue-500 bg-white border-2 border-blue-500 hover:bg-blue-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm px-7 py-3 text-center"
-          >
-            Sign In
-          </Link>
-          <Link
-            to="/signup"
-            className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm px-7 py-3 text-center"
-          >
-            Sign Up
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              to="/app"
+              className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm px-7 py-3 text-center"
+            >
+              Go To The App
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-blue-500 bg-white border-2 border-blue-500 hover:bg-blue-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm px-7 py-3 text-center"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium text-sm px-7 py-3 text-center"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -53,7 +65,7 @@ const Header = () => {
         </div>
         <div
           className={`items-center justify-between ${
-            !isMenuOpen ? "hidden" : ""
+            !isMenuOpen ? 'hidden' : ''
           } w-full md:flex md:w-auto md:order-1`}
           id="navbar-sticky"
         >
@@ -63,8 +75,8 @@ const Header = () => {
                 to="/"
                 className={(isActiveObj) =>
                   isActiveObj.isActive
-                    ? "block py-2 px-3 font-bold text-white bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500"
-                    : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    ? 'block py-2 px-3 font-bold text-white bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500'
+                    : 'block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'
                 }
                 aria-current="page"
               >
@@ -76,8 +88,8 @@ const Header = () => {
                 to="/app"
                 className={(isActiveObj) =>
                   isActiveObj.isActive
-                    ? "block py-2 px-3 text-white font-bold bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500"
-                    : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    ? 'block py-2 px-3 text-white font-bold bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500'
+                    : 'block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'
                 }
               >
                 Send File
@@ -88,8 +100,8 @@ const Header = () => {
                 to="/download"
                 className={(isActiveObj) =>
                   isActiveObj.isActive
-                    ? "block py-2 px-3 text-white font-bold bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500"
-                    : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    ? 'block py-2 px-3 text-white font-bold bg-blue-500 rounded md:bg-transparent md:text-blue-800 md:p-0 md:dark:text-blue-500'
+                    : 'block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'
                 }
               >
                 File Download
