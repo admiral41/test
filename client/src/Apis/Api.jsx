@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Api = axios.create({
     baseURL: 'http://localhost:5000',
@@ -11,19 +11,36 @@ const Api = axios.create({
 
 const ApiJson = axios.create({
     baseURL: 'http://localhost:5000',
-    withCredentials: true,
+    withCredentials: true, // This allows cookies to be sent
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-const config = {
-    headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+// Interceptor to add Authorization header to every request
+Api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
     },
-};
+    (error) => Promise.reject(error)
+);
 
-// Add interceptor for handling token expiration
+ApiJson.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Interceptor for handling token expiration
 Api.interceptors.response.use(
     response => response,
     error => {
@@ -50,7 +67,7 @@ ApiJson.interceptors.response.use(
 
 export const loginApi = (data) => ApiJson.post('/api/users/login', data);
 export const registerApi = (data) => ApiJson.post('/api/users/register', data);
-export const uploadFileApi = (data, options) => Api.post('/api/files/upload', data, {
-    ...config,
-    ...options,
-});
+export const uploadFileApi = (data, options) => Api.post('/api/files/upload', data, options);
+export const changePasswordApi = (data) => {
+    return ApiJson.post('/api/users/change-password', data);
+};
