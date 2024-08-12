@@ -23,11 +23,32 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a password'],
     },
+    passwordHistory: [{
+        type: String
+    }],
+    passwordUpdatedAt: {
+        type: Date,
+        default: Date.now
+    },
     files: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'File'
     }],
-    logs: [logSchema]
+    logs: [logSchema],
+    failedLoginAttempts: {
+        type: Number,
+        default: 0
+    },
+    accountLocked: {
+        type: Boolean,
+        default: false
+    },
+    resetToken: String,
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationToken: String,
 });
 
 module.exports = mongoose.model("User", userSchema);

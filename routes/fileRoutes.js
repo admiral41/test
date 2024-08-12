@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs'); // Use bcryptjs only
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
@@ -10,17 +10,30 @@ const User = require("../models/userModel");
 const authMiddleware = require('../middleware/authMiddleware');
 const sendEmail = require('../middleware/sendEmail');
 const { v4: uuidv4 } = require('uuid');
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");
+const allowedExtensions = [
+    "pdf", "docx", "doc", "xls", "xlsx", "csv", "txt", "rtf", "html", "zip",
+    "mp3", "m4a", "wma", "mpg", "flv", "avi", "jpg", "jpeg", "png", "gif",
+    "ppt", "pptx", "wav", "mp4", "m4v", "wmv", "avi", "epub"
+];
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, "uploads/");
+        },
+        filename: (req, file, cb) => {
+            cb(null, Date.now() + "-" + file.originalname);
+        }
+    }),
+    fileFilter: (req, file, cb) => {
+        const fileExtension = file.originalname.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            return cb(new Error("Invalid file type"));
+        }
+        cb(null, true);
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname);
-    },
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB file size limit
 });
 
-const upload = multer({ storage });
 
 router.post("/upload", authMiddleware, upload.single("encryptedFile"), async (req, res) => {
     try {
@@ -32,7 +45,7 @@ router.post("/upload", authMiddleware, upload.single("encryptedFile"), async (re
 
         const hashedPassword = bcrypt.hashSync(password, 10);
         const fileId = uuidv4();
-        const downloadLink = `http://localhost:5000/api/files/download/${fileId}`;
+        const downloadLink = `http://localhost:3000/download`; // Correct frontend download link
 
         // Encrypt the file
         const fileBuffer = fs.readFileSync(req.file.path);
@@ -47,7 +60,7 @@ router.post("/upload", authMiddleware, upload.single("encryptedFile"), async (re
             password: hashedPassword,
             originalName,
             path: req.file.path,
-            downloadLink,
+            downloadLink: `http://localhost:5000/api/files/download/${fileId}`, // Backend download link for internal use
             extension: req.file.mimetype,
             uploadedBy: req.user._id
         });
@@ -59,7 +72,13 @@ router.post("/upload", authMiddleware, upload.single("encryptedFile"), async (re
         await user.save();
 
         if (receiverEmail) {
-            const emailResult = await sendEmail(receiverEmail, fileId, user.name);
+            const emailResult = await sendEmail(
+                receiverEmail,
+                'Here is your File ID!',
+                { senderName: 'Your App', fileID: fileId, downloadLink: downloadLink },
+                'upload'
+            );
+
             if (!emailResult.success) {
                 return res.status(500).json({ message: "File uploaded, but error sending email", error: emailResult.error });
             }
@@ -70,6 +89,7 @@ router.post("/upload", authMiddleware, upload.single("encryptedFile"), async (re
         res.status(500).json({ message: "Error uploading file", error });
     }
 });
+
 
 router.get("/download/:id", async (req, res) => {
     try {

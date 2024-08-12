@@ -44,36 +44,41 @@ const UploadForm = () => {
 
     const upload = async (e) => {
         e.preventDefault();
-
+    
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.error("Please log in first.");
+            window.location.href = '/login';
+            return;
+        }
+    
         if (receiverEmail.length === 0) {
             toast.error("Please enter value for email");
             return;
         }
-
+    
         if (!receiversEmailSchema.safeParse(receiverEmail).success) {
             toast.error("Please enter valid email");
             return;
         }
-
+    
         if (!passwordSchema.safeParse(filePassword).success) {
             toast.error("File password must be minimum 5 characters and must be string");
             return;
         }
-
+    
         if (!hasUpperCase(filePassword)) {
             toast.error("File password should have at least 1 uppercase character");
             return;
         }
-
+    
         try {
             let formData = new FormData();
             formData.append("encryptedFile", file);
             formData.append("originalName", file.name);
             formData.append("receiverEmail", receiverEmail);
             formData.append("password", filePassword);
-
-            console.log("FormData being sent:", formData);
-
+    
             await uploadFileApi(formData, {
                 onUploadProgress: (progressEvent) => {
                     const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -90,6 +95,7 @@ const UploadForm = () => {
             toast.error("Error uploading file");
         }
     };
+    
 
     const hasUpperCase = (str) => {
         return str !== str.toLowerCase();

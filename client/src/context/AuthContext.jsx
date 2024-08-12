@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { checkTokenExpiration } from '../utils/checkTokenUtils';  // Import the token check utility
 
 export const AuthContext = createContext();
 
@@ -9,9 +10,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    if (token && userData) {
+
+    if (token && userData && !checkTokenExpiration()) {
       setIsLoggedIn(true);
       setUser(JSON.parse(userData));
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }, []);
 
@@ -21,3 +26,5 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => React.useContext(AuthContext);

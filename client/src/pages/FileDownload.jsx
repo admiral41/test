@@ -12,7 +12,7 @@ const FileDownload = () => {
 
     const downloadSchema = z.object({
         fileId: z.string().min(5, "File ID field must be valid length and value"),
-        password: z.string().min(5, "Password field must be valid length and value")
+        password: z.string().min(7, "Password field must be valid length and value")
     });
 
     const handleDownload = async () => {
@@ -24,19 +24,12 @@ const FileDownload = () => {
             return;
         }
 
-        const token = localStorage.getItem("token");
-        if (!token) {
-            toast.error("User is not logged in");
-            return;
-        }
-
         try {
             const response = await axios.get(
                 `http://localhost:5000/api/files/download/${fileId}`,
                 {
                     responseType: "arraybuffer",
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'password': password
                     }
                 }

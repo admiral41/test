@@ -5,23 +5,25 @@ const path = require("path");
 const fileRoutes = require('./routes/fileRoutes');
 const userRoutes = require('./routes/userRoutes');
 const helmet = require('helmet');
-const xss = require('xss-clean');
+const xssClean = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const requestIp = require('request-ip');
-const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
 // creating an express app
 const app = express();
 // configure dotenv to use .env
 dotenv.config();
+// middleware to allow requests from the frontend
 const corsOptions = {
     origin: true,
+    methods: ["GET, POST, PUT, DELETE"],
     credentials: true,
-    optionSuccessStatus: 200
+    optionsSuccessStatus: 200 
 };
 app.use(cors(corsOptions));
+
 
 // connecting to db
 connectToDB();
@@ -29,8 +31,8 @@ connectToDB();
 // Middleware to secure HTTP headers
 app.use(helmet());
 
-// Middleware to sanitize user input
-app.use(xss());
+// Middleware to sanitize user input against XSS attacks
+app.use(xssClean());
 
 // Middleware to limit repeated requests to public APIs
 const limiter = rateLimit({
@@ -40,7 +42,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Middleware to sanitize data
+// Middleware to sanitize data against NoSQL injection
 app.use(mongoSanitize());
 
 // Middleware to get client IP
@@ -56,7 +58,11 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "/uploads"))
 );
-
+// Middleware to log the route and method
+app.use((req, res, next) => {
+    console.log(`Route: ${req.originalUrl}, Method: ${req.method}`);
+    next();
+  });
 app.use('/api/files', fileRoutes); // Use file routes
 app.use('/api/users', userRoutes); // Use user routes
 
